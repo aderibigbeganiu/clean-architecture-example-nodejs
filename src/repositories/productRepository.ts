@@ -1,6 +1,8 @@
+import { injectable } from "inversify";
 import { Product } from "../entities/Product";
 import { IProductRepository } from "../interfaces/IProductRepository";
 
+@injectable()
 export class ProductRepository implements IProductRepository {
     private products: Product[] = [];
 
