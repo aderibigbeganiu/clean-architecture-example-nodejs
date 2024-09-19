@@ -4,7 +4,7 @@ export class Product {
         public readonly description: string,
         public readonly price: number,
         public stock: number,
-        public readonly id?: number
+        public readonly id?: string
     ) {}
 }
 

@@ -10,9 +10,11 @@ import { IMailer } from "../interfaces/IMailer";
 import { Mailer } from "../external-libraries/mailer";
 import { IMessageBroker } from "../interfaces/IMessageBroker";
 import { MessageBroker } from "../external-libraries/messageBroker";
+import { ProductModel } from "../models/productModel";
 
 const container = new Container();
 
+container.bind(INTERFACE_TYPE.ProductModel).toConstantValue(ProductModel);
 container
     .bind<IProductRepository>(INTERFACE_TYPE.ProductRepository)
     .to(ProductRepository);
@@ -34,5 +36,6 @@ const controller = container.get<ProductController>(
 router.post("/products", controller.onCreateProduct.bind(controller));
 router.get("/products", controller.onGetProducts.bind(controller));
 router.patch("/products/:id", controller.onUpdateStock.bind(controller));
+router.get("/products/:id", controller.onGetProductById.bind(controller));
 
 export default router;

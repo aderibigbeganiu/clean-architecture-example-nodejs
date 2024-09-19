@@ -37,12 +37,24 @@ export class ProductController {
     }
     async onUpdateStock(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = parseInt(req.params.id);
+            const id = req.params.id;
             const stock = parseInt(req.body.stock);
 
             const data = await this.interactor.updateStock(id, stock);
 
             res.status(204).json(data);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async onGetProductById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = req.params.id;
+
+            const data = await this.interactor.getProductById(id);
+
+            res.status(200).json(data);
         } catch (error) {
             next(error);
         }

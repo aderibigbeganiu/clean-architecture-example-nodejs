@@ -1,36 +1,49 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Product } from "../entities/Product";
 import { IProductRepository } from "../interfaces/IProductRepository";
+import mongoose, { Model } from "mongoose";
+import { INTERFACE_TYPE } from "../utils";
 
 @injectable()
 export class ProductRepository implements IProductRepository {
-    private products: Product[] = [];
+    private client: Model<Product>;
 
-    constructor() {
-        this.products = [];
+    constructor(
+        @inject(INTERFACE_TYPE.ProductModel) client: mongoose.Model<Product>
+    ) {
+        this.client = client;
     }
-    create(data: Product): Promise<Product> {
-        const product = new Product(
-            data.name,
-            data.description,
-            data.price,
-            data.stock,
-            this.products.length + 1
-        );
-        this.products.push(product);
+    async create(data: Product): Promise<Product> {
+        const product = new this.client({
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            stock: data.stock,
+        });
+        product.save();
         return Promise.resolve(product);
     }
-    update(id: number, stock: number): Promise<Product> {
-        const product = this.products.find((p) => p.id === id);
+    async update(id: string, stock: number): Promise<Product> {
+        const product = await this.client.findOneAndUpdate(
+            { _id: id },
+            { stock },
+            { new: true }
+        );
         if (!product) {
             throw new Error(`Product with id ${id} not found.`);
         }
-        product.stock = stock;
         return Promise.resolve(product);
     }
-    find(limit: number, offset: number): Promise<Product[]> {
-        const startIndex = offset;
-        const endIndex = Math.min(startIndex + limit, this.products.length);
-        return Promise.resolve(this.products.slice(startIndex, endIndex));
+    async find(limit: number, offset: number): Promise<Product[]> {
+        const products = await this.client.find().skip(offset).limit(limit);
+        return products;
+    }
+
+    async findById(id: string): Promise<Product> {
+        const product = await this.client.findById(id);
+        if (!product) {
+            throw new Error(`Product with id ${id} not found.`);
+        }
+        return product;
     }
 }

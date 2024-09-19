@@ -12,7 +12,8 @@ export class ProductInteractor implements IProductInteractor {
     private messageBroker: IMessageBroker;
 
     constructor(
-        @inject(INTERFACE_TYPE.ProductRepository) repository: IProductRepository,
+        @inject(INTERFACE_TYPE.ProductRepository)
+        repository: IProductRepository,
         @inject(INTERFACE_TYPE.Mailer) mailer: IMailer,
         @inject(INTERFACE_TYPE.MessageBroker) messageBroker: IMessageBroker
     ) {
@@ -30,7 +31,7 @@ export class ProductInteractor implements IProductInteractor {
         );
         return product;
     }
-    async updateStock(id: number, stock: number) {
+    async updateStock(id: string, stock: number) {
         const product = await this.repository.update(id, stock);
         await this.messageBroker.publish("stock_update", {
             productId: product.id,
@@ -40,5 +41,9 @@ export class ProductInteractor implements IProductInteractor {
     }
     async getProducts(limit: number, offset: number) {
         return await this.repository.find(limit, offset);
+    }
+
+    async getProductById(id: string) {
+        return await this.repository.findById(id);
     }
 }
